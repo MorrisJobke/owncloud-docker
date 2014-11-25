@@ -1,0 +1,45 @@
+diff --git a/lib/private/db.php b/lib/private/db.php
+index d58f7c3..f408556 100644
+--- a/lib/private/db.php
++++ b/lib/private/db.php
+@@ -88,6 +88,7 @@ class OC_DB {
+ 		}
+ 
+ 		$connectionParams['tablePrefix'] = OC_Config::getValue('dbtableprefix', 'oc_');
++		$connectionParams['sqlite.journal_mode'] = OC_Config::getValue('sqlite.journal_mode', 'WAL');
+ 
+ 		//additional driver options, eg. for mysql ssl
+ 		$driverOptions = OC_Config::getValue('dbdriveroptions', null);
+diff --git a/lib/private/db/sqlitesessioninit.php b/lib/private/db/sqlitesessioninit.php
+index 7e1166b..5240d5b 100644
+--- a/lib/private/db/sqlitesessioninit.php
++++ b/lib/private/db/sqlitesessioninit.php
+@@ -19,12 +19,19 @@ class SQLiteSessionInit implements EventSubscriber {
+ 	private $caseSensitiveLike;
+ 
+ 	/**
++	 * @var string
++	 */
++	private $journalMode;
++
++	/**
+ 	 * Configure case sensitive like for each connection
+ 	 *
+ 	 * @param bool $caseSensitiveLike
++	 * @param string $journalMode
+ 	 */
+-	public function __construct($caseSensitiveLike = true) {
++	public function __construct($caseSensitiveLike = true, $journalMode = 'WAL') {
+ 		$this->caseSensitiveLike = $caseSensitiveLike;
++		$this->journalMode = $journalMode;
+ 	}
+ 
+ 	/**
+@@ -34,6 +41,7 @@ class SQLiteSessionInit implements EventSubscriber {
+ 	public function postConnect(ConnectionEventArgs $args) {
+ 		$sensitive = ($this->caseSensitiveLike) ? 'true' : 'false';
+ 		$args->getConnection()->executeUpdate('PRAGMA case_sensitive_like = ' . $sensitive);
++		$args->getConnection()->executeUpdate('PRAGMA journal_mode = ' . $this->journalMode);
+ 	}
+ 
+ 	public function getSubscribedEvents() {
