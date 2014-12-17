@@ -1,0 +1,25 @@
+From 0b2c24081f3e0963e28bdf5a5d0c81017553753e Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Tue, 11 Nov 2014 15:42:50 +0100
+Subject: [PATCH] Return real mime type on PROPFIND
+
+Return the real (insecure) mime type on PROPFIND
+---
+ lib/private/connector/sabre/file.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/private/connector/sabre/file.php b/lib/private/connector/sabre/file.php
+index 3705d29..d93b8e6 100644
+--- a/lib/private/connector/sabre/file.php
++++ b/lib/private/connector/sabre/file.php
+@@ -219,6 +219,10 @@ public function getSize() {
+ 	public function getContentType() {
+ 		$mimeType = $this->info->getMimetype();
+ 
++		// PROPFIND needs to return the correct mime type, for consistency with the web UI
++		if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'PROPFIND' ) {
++			return $mimeType;
++		}
+ 		return \OC_Helper::getSecureMimeType($mimeType);
+ 	}
+ 
