@@ -55,11 +55,20 @@ cat > /srv/www/htdocs/owncloud/config/autoconfig.php <<DELIM
 );
 DELIM
 
+cat > /srv/www/htdocs/owncloud/config/domains.config.php <<DELIM
+<?php
+\$CONFIG = array (
+'trusted_domains' => array(),
+);
+DELIM
+
 cat /srv/www/htdocs/owncloud/config/autoconfig.php
 
 echo "Setting up ownCloud ..."
 
 cd /srv/www/htdocs/owncloud/ && php -f index.php | grep -i -C9999 error && echo "Error during setup" && exit 101
+
+cd /srv/www/htdocs/owncloud/ && ./occ app:enable provisioning_api
 
 # fix wrong permission as this script is run as root and apache runs as wwwrun
 chown -R wwwrun:www /srv/www/htdocs/owncloud
