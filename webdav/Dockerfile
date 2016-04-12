@@ -2,7 +2,6 @@
 FROM ubuntu:14.04
 MAINTAINER hey@morrisjobke.de
 
-RUN apt-get update -y && apt-get -y upgrade
 RUN apt-get install -y apache2 apache2-utils
 
 RUN a2enmod dav dav_fs
