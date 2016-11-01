@@ -1,7 +1,8 @@
 
-FROM ubuntu:14.04
+FROM ubuntu:16.10
 MAINTAINER hey@morrisjobke.de
 
+RUN apt-get update
 RUN apt-get install -y apache2 apache2-utils
 
 RUN a2enmod dav dav_fs
@@ -23,5 +24,7 @@ RUN a2ensite webdav
 ADD run.sh /
 
 EXPOSE 80
+
+VOLUME /var/webdav
 
 CMD ["/run.sh"]
